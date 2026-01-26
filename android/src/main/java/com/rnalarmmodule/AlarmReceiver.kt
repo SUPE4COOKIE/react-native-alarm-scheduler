@@ -62,6 +62,8 @@ class AlarmReceiver : BroadcastReceiver() {
 
         val title = intent.getStringExtra("title") ?: "Alarm"
         val body = intent.getStringExtra("body") ?: ""
+        val snoozeEnabled = intent.getBooleanExtra("snoozeEnabled", true)
+        val snoozeInterval = intent.getIntExtra("snoozeInterval", SNOOZE_MINUTES)
         activeAlarmId = id
 
         emitActiveAlarmId(activeAlarmId)
@@ -69,7 +71,7 @@ class AlarmReceiver : BroadcastReceiver() {
         acquireWakeLock(context)
         setupAudio(context)
         playAlarm(context, id)
-        showNotificationWithActions(context, id, title, body)
+        showNotificationWithActions(context, id, title, body, snoozeEnabled, snoozeInterval)
     }
 
     private fun acquireWakeLock(context: Context) {
@@ -181,7 +183,7 @@ class AlarmReceiver : BroadcastReceiver() {
         }.start()
     }
 
-    private fun showNotificationWithActions(context: Context, id: String, title: String, body: String) {
+    private fun showNotificationWithActions(context: Context, id: String, title: String, body: String, snoozeEnabled: Boolean = true, snoozeInterval: Int = SNOOZE_MINUTES) {
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -203,17 +205,21 @@ class AlarmReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val snoozeIntent = Intent(context, AlarmReceiver::class.java).apply {
-            action = ACTION_SNOOZE
-            putExtra("id", id)
-            putExtra("title", title)
-            putExtra("body", "$body (Snoozed)")
-            putExtra("snoozeMinutes", SNOOZE_MINUTES)
-        }
-        val snoozePendingIntent = PendingIntent.getBroadcast(
-            context, id.hashCode() + 2, snoozeIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val snoozePendingIntent = if (snoozeEnabled) {
+            val snoozeIntent = Intent(context, AlarmReceiver::class.java).apply {
+                action = ACTION_SNOOZE
+                putExtra("id", id)
+                putExtra("title", title)
+                putExtra("body", "$body (Snoozed)")
+                putExtra("snoozeMinutes", snoozeInterval)
+                putExtra("snoozeEnabled", snoozeEnabled)
+                putExtra("snoozeInterval", snoozeInterval)
+            }
+            PendingIntent.getBroadcast(
+                context, id.hashCode() + 2, snoozeIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        } else null
 
         // Try to get the host app's launcher activity
         val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
@@ -235,10 +241,14 @@ class AlarmReceiver : BroadcastReceiver() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Stop", stopPendingIntent)
-            .addAction(android.R.drawable.ic_menu_recent_history, "Snooze", snoozePendingIntent)
             .setOngoing(true)
             .setSound(null)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+
+        // Only add snooze action if snooze is enabled
+        if (snoozeEnabled && snoozePendingIntent != null) {
+            builder.addAction(android.R.drawable.ic_menu_recent_history, "Snooze", snoozePendingIntent)
+        }
 
         if (fullScreenPendingIntent != null) {
             builder.setFullScreenIntent(fullScreenPendingIntent, true)

@@ -153,10 +153,12 @@ if (activeAlarm) {
 
 ```typescript
 type AlarmParams = {
-  id: string;          // Unique identifier for the alarm
-  datetimeISO: string; // ISO 8601 timestamp (e.g., "2025-01-15T08:30:00")
-  title?: string;      // Notification title (default: "Alarm")
-  body?: string;       // Notification body (default: "")
+  id: string;              // Unique identifier for the alarm
+  datetimeISO: string;     // ISO 8601 timestamp (e.g., "2025-01-15T08:30:00")
+  title?: string;          // Notification title (default: "Alarm")
+  body?: string;           // Notification body (default: "")
+  snoozeEnabled?: boolean; // Whether snoozing is enabled (default: true)
+  snoozeInterval?: number; // Snooze interval in minutes (default: 5)
 };
 
 type PermissionResult = {
@@ -242,7 +244,7 @@ Returns a subscription object with a `remove()` method to unsubscribe.
 ## Limitations
 
 - **Expo**: This library is not compatible with Expo Go. You need to use a development build or eject.
-- **iOS**: The iOS implementation uses local notifications, which don't provide the same persistent alarm experience as Android.
+- **iOS**: This library is not compatible with iOS.
 - **Background Restrictions**: Some device manufacturers (Samsung, Xiaomi, Huawei, etc.) may kill background processes. Users may need to disable battery optimization for your app.
 
 ## Troubleshooting
