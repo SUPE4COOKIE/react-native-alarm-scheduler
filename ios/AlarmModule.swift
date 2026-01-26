@@ -47,6 +47,8 @@ class AlarmModule: RCTEventEmitter {
         
         let title = alarm["title"] as? String ?? "Alarm"
         let body = alarm["body"] as? String ?? ""
+        let snoozeEnabled = alarm["snoozeEnabled"] as? Bool ?? true
+        let snoozeInterval = alarm["snoozeInterval"] as? Int ?? 5
         
         // Parse ISO date
         let dateFormatter = ISO8601DateFormatter()
@@ -79,8 +81,15 @@ class AlarmModule: RCTEventEmitter {
         content.title = title
         content.body = body
         content.sound = UNNotificationSound.default
-        content.categoryIdentifier = "ALARM_CATEGORY"
-        content.userInfo = ["alarmId": id]
+        content.categoryIdentifier = snoozeEnabled ? "ALARM_CATEGORY_WITH_SNOOZE" : "ALARM_CATEGORY"
+        content.userInfo = [
+            "alarmId": id,
+            "snoozeEnabled": snoozeEnabled,
+            "snoozeInterval": snoozeInterval
+        ]
+        
+        // Register notification category with appropriate actions
+        registerNotificationCategory(snoozeEnabled: snoozeEnabled)
         
         // Create trigger
         let calendar = Calendar.current
@@ -97,8 +106,40 @@ class AlarmModule: RCTEventEmitter {
             }
             
             // Save alarm to UserDefaults
-            self.saveAlarm(id: id, datetimeISO: datetimeISO, title: title, body: body)
+            self.saveAlarm(id: id, datetimeISO: datetimeISO, title: title, body: body, snoozeEnabled: snoozeEnabled, snoozeInterval: snoozeInterval)
             resolve(nil)
+        }
+    }
+    
+    private func registerNotificationCategory(snoozeEnabled: Bool) {
+        let stopAction = UNNotificationAction(
+            identifier: "STOP_ACTION",
+            title: "Stop",
+            options: [.destructive, .foreground]
+        )
+        
+        if snoozeEnabled {
+            let snoozeAction = UNNotificationAction(
+                identifier: "SNOOZE_ACTION",
+                title: "Snooze",
+                options: []
+            )
+            
+            let categoryWithSnooze = UNNotificationCategory(
+                identifier: "ALARM_CATEGORY_WITH_SNOOZE",
+                actions: [stopAction, snoozeAction],
+                intentIdentifiers: [],
+                options: [.customDismissAction]
+            )
+            UNUserNotificationCenter.current().setNotificationCategories([categoryWithSnooze])
+        } else {
+            let categoryWithoutSnooze = UNNotificationCategory(
+                identifier: "ALARM_CATEGORY",
+                actions: [stopAction],
+                intentIdentifiers: [],
+                options: [.customDismissAction]
+            )
+            UNUserNotificationCenter.current().setNotificationCategories([categoryWithoutSnooze])
         }
     }
     
@@ -166,15 +207,23 @@ class AlarmModule: RCTEventEmitter {
         
         // Get alarm details
         if let alarm = getAlarmById(id: id) {
-            let title = alarm["title"] as? String ?? "Alarm"
-            let body = (alarm["body"] as? String ?? "") + " (Snoozed)"
+            let title = alarm["title"] ?? "Alarm"
+            let body = (alarm["body"] ?? "") + " (Snoozed)"
+            let snoozeEnabled = (alarm["snoozeEnabled"] as NSString?)?.boolValue ?? true
+            let snoozeInterval = Int(alarm["snoozeInterval"] ?? "5") ?? 5
             
             let content = UNMutableNotificationContent()
             content.title = title
             content.body = body
             content.sound = UNNotificationSound.default
-            content.categoryIdentifier = "ALARM_CATEGORY"
-            content.userInfo = ["alarmId": id]
+            content.categoryIdentifier = snoozeEnabled ? "ALARM_CATEGORY_WITH_SNOOZE" : "ALARM_CATEGORY"
+            content.userInfo = [
+                "alarmId": id,
+                "snoozeEnabled": snoozeEnabled,
+                "snoozeInterval": snoozeInterval
+            ]
+            
+            registerNotificationCategory(snoozeEnabled: snoozeEnabled)
             
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(minutes * 60), repeats: false)
             let request = UNNotificationRequest(identifier: id, content: content, trigger: trigger)
@@ -202,13 +251,15 @@ class AlarmModule: RCTEventEmitter {
     
     // MARK: - Storage Helpers
     
-    private func saveAlarm(id: String, datetimeISO: String, title: String, body: String) {
+    private func saveAlarm(id: String, datetimeISO: String, title: String, body: String, snoozeEnabled: Bool = true, snoozeInterval: Int = 5) {
         var alarms = getAlarmsDict()
         alarms[id] = [
             "id": id,
             "datetimeISO": datetimeISO,
             "title": title,
-            "body": body
+            "body": body,
+            "snoozeEnabled": String(snoozeEnabled),
+            "snoozeInterval": String(snoozeInterval)
         ]
         UserDefaults.standard.set(alarms, forKey: AlarmModule.PREFS_KEY)
     }

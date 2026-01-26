@@ -17,6 +17,10 @@ export type AlarmParams = {
   title?: string;
   /** Body text to display in the notification */
   body?: string;
+  /** Whether snoozing is enabled for this alarm */
+  snoozeEnabled?: boolean;
+  /** Interval in minutes for snoozing */
+  snoozeInterval?: number;
 };
 
 /**
