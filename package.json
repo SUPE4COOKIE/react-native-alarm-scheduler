@@ -1,0 +1,54 @@
+{
+  "name": "react-native-alarmageddon",
+  "version": "2.0.0",
+  "description": "Native exact alarm scheduling for React Native with sound, snooze, and boot persistence",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "react-native": "src/index.ts",
+  "source": "src/index.ts",
+  "files": [
+    "lib/",
+    "src/",
+    "android/",
+    "ios/",
+    "react-native.config.js",
+    "react-native-alarmageddon.podspec",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "react-native",
+    "alarm",
+    "scheduler",
+    "notification",
+    "android",
+    "exact-alarm",
+    "wakeup",
+    "timer",
+    "reminder"
+  ],
+  "author": "Alameda Apps",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alamedapps/react-native-alarmageddon.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alamedapps/react-native-alarmageddon/issues"
+  },
+  "homepage": "https://github.com/alamedapps/react-native-alarmageddon#readme",
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-native": ">=0.60.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-native": "^0.72.0",
+    "typescript": "^5.0.0"
+  }
+}

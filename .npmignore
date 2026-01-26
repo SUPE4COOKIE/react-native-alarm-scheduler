@@ -1,0 +1,52 @@
+# Source files (TypeScript source is not needed, lib/ has compiled JS)
+# src/
+
+# Development files
+.git
+.gitignore
+.github
+.vscode
+.idea
+
+# Test files
+__tests__
+__mocks__
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+coverage
+
+# Build artifacts
+*.log
+*.tgz
+
+# Example/demo apps
+example
+examples
+
+# Documentation source (README is included)
+docs
+
+# Development config
+.eslintrc*
+.prettierrc*
+prettier.config.*
+jest.config.*
+babel.config.*
+metro.config.*
+tsconfig.json
+
+# CI/CD
+.travis.yml
+.circleci
+.github
+
+# Misc
+.DS_Store
+*.swp
+*.swo
+Thumbs.db
+
+# Plan file (not needed for package users)
+PLAN.md

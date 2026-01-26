@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+lib/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Android
+android/.gradle/
+android/build/
+android/local.properties
+android/*.iml
+*.apk
+*.aab
+
+# iOS
+ios/build/
+ios/Pods/
+ios/*.xcworkspace
+ios/*.xcuserdata
+*.ipa
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+
+# Temporary files
+*.swp
+*.swo
+*~
+.temp/
+.tmp/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Package manager locks (optional - uncomment if you want to ignore)
+# package-lock.json
+# yarn.lock
