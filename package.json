@@ -1,5 +1,5 @@
 {
-  "name": "react-native-alarmageddon",
+  "name": "react-native-alarm-scheduler",
   "version": "2.1.1",
   "description": "Native exact alarm scheduling for React Native with sound, snooze, and boot persistence",
   "main": "lib/index.js",

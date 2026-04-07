@@ -195,6 +195,17 @@ function onAlarmStateChange(callback: AlarmStateCallback): AlarmSubscription {
 }
 
 /**
+ * Register a headless task to run when an alarm triggers in the background.
+ * Your task function will receive an object with: { id, title, body, action }
+ * 
+ * @param task The async function to execute
+ */
+export function registerAlarmHeadlessTask(task: (taskData: any) => Promise<void>): void {
+  const { AppRegistry } = require('react-native');
+  AppRegistry.registerHeadlessTask('RNAlarmTask', () => task);
+}
+
+/**
  * React Native Alarmageddon - Native exact alarm scheduling
  */
 const RNAlarmModule = {
@@ -208,6 +219,7 @@ const RNAlarmModule = {
   snoozeCurrentAlarm,
   getCurrentAlarmPlaying,
   onAlarmStateChange,
+  registerAlarmHeadlessTask,
 };
 
 export default RNAlarmModule;

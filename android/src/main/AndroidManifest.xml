@@ -16,6 +16,9 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application>
+        <!-- Headless JS Task Service for background JS execution -->
+        <service android:name=".AlarmTaskService" />
+
         <!-- Alarm broadcast receiver -->
         <receiver
             android:name=".AlarmReceiver"

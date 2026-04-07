@@ -67,11 +67,27 @@ class AlarmReceiver : BroadcastReceiver() {
         activeAlarmId = id
 
         emitActiveAlarmId(activeAlarmId)
+        startHeadlessJsTask(context, id, title, body, "RING")
 
         acquireWakeLock(context)
         setupAudio(context)
         playAlarm(context, id)
         showNotificationWithActions(context, id, title, body, snoozeEnabled, snoozeInterval)
+    }
+
+    private fun startHeadlessJsTask(context: Context, id: String, title: String, body: String, action: String) {
+        try {
+            val serviceIntent = Intent(context, AlarmTaskService::class.java).apply {
+                putExtra("id", id)
+                putExtra("title", title)
+                putExtra("body", body)
+                putExtra("action", action)
+            }
+            context.startService(serviceIntent)
+            com.facebook.react.HeadlessJsTaskService.acquireWakeLockNow(context)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start Headless JS Task: ${e.message}")
+        }
     }
 
     private fun acquireWakeLock(context: Context) {
