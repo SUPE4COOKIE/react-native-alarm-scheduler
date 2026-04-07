@@ -70,9 +70,9 @@ class AlarmReceiver : BroadcastReceiver() {
         startHeadlessJsTask(context, id, title, body, "RING")
 
         acquireWakeLock(context)
-        setupAudio(context)
-        playAlarm(context, id)
-        showNotificationWithActions(context, id, title, body, snoozeEnabled, snoozeInterval)
+        // setupAudio(context)
+        // playAlarm(context, id)
+        // showNotificationWithActions(context, id, title, body, snoozeEnabled, snoozeInterval)
     }
 
     private fun startHeadlessJsTask(context: Context, id: String, title: String, body: String, action: String) {
